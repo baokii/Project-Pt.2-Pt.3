@@ -1,0 +1,125 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Scanner;
+
+public class CasinoWar {
+  static ArrayList<String> playerCards = new ArrayList<>();
+  static ArrayList<String> dealerCards = new ArrayList<>();
+  static int playerMoney = 100;
+
+  public static void main(String[] args) {
+    Scanner scan = new Scanner(System.in);
+    System.out.println("Welcome to Casino War!");
+    System.out.println("Dealing cards...");
+
+    // Create the deck of cards
+    ArrayList<String> deck = new ArrayList<>();
+    String[] suits = {"Hearts", "Diamonds", "Spades", "Clubs"};
+    for (String suit : suits) {
+      for (int i = 2; i <= 10; i++) {
+        deck.add(i + " of " + suit);
+      }
+      deck.add("Jack of " + suit);
+      deck.add("Queen of " + suit);
+      deck.add("King of " + suit);
+      deck.add("Ace of " + suit);
+    }
+
+    // Deal cards to player and dealer
+    for (int i = 0; i < 26; i++) {
+      playerCards.add(deck.get(i));
+      dealerCards.add(deck.get(26 + i));
+    }
+    Collections.shuffle(playerCards);
+    Collections.shuffle(dealerCards);
+
+    while (!playerCards.isEmpty() && !dealerCards.isEmpty()) {
+      System.out.println("You have $" + playerMoney + ". How much do you want to wager?");
+      int wager = scan.nextInt();
+      while (wager > playerMoney) {
+        System.out.println("You don't have enough money. Enter a new wager:");
+        wager = scan.nextInt();
+      }
+
+      String playerCard = playerCards.get(0);
+      String dealerCard = dealerCards.get(0);
+
+      System.out.println("Your card: " + playerCard);
+      System.out.println("Dealer's card: " + dealerCard);
+
+    int playerValue = getCardValue(playerCard);
+    int dealerValue = getCardValue(dealerCard);
+
+
+      if (playerValue > dealerValue) {
+        System.out.println("You win this round and earn $" + wager + "!");
+        playerMoney += wager;
+        playerCards.remove(0);
+        dealerCards.remove(0);
+      } else if (playerValue < dealerValue) {
+        System.out.println("Dealer wins this round and you lose $" + wager + ".");
+        playerMoney -= wager;
+        playerCards.remove(0);
+        dealerCards.remove(0);
+      } else {
+        System.out.println("War!");
+        ArrayList<String> warPile = new ArrayList<>();
+        warPile.add(playerCard);
+        warPile.add(dealerCard);
+        while (playerCards.get(0).equals(dealerCards.get(0))) {
+          System.out.println("Another war!");
+          warPile.add(playerCards.get(0));
+          warPile.add(dealerCards.get(0));
+          playerCards.remove(0);
+          dealerCards.remove(0);
+        }
+        int winner = (valueOfCard(playerCards.get(0)) > valueOfCard(dealerCards.get(0))) ? 1 : 0;
+        if (winner == 1) {
+          System.out.println("You win the war and earn $" + wager + "!");
+          playerMoney += wager;
+          playerCards.remove(0);
+          dealerCards.remove(0);
+          playerCards.addAll(warPile);
+        } else {
+          System.out.println("Dealer wins the war and you lose $" + wager + ".");
+          playerMoney -= wager;
+          dealerCards.remove(0);
+          dealerCards.addAll(warPile);
+        }
+      }
+    }
+    if (playerCards.isEmpty()) {
+      System.out.println("Dealer wins the game. You are out of cards.");
+    } else {
+      System.out.println("You win the game. The dealer is out of cards.");
+    }
+    System.out.println("You leave the game with $" + playerMoney + ".");
+  }
+  private static int getCardValue(String card) {
+    switch (card.substring(0, 1)) {
+        case "A":
+            return 14;
+        case "K":
+            return 13;
+        case "Q":
+            return 12;
+        case "J":
+            return 11;
+        case "1":
+            return 10;
+        default:
+            return Integer.parseInt(card.substring(0, 1));
+    }
+  }
+    private static int valueOfCard(String card) {
+        switch(card.substring(0, 1)) {
+          case "A": return 14;
+         case "K": return 13;
+         case "Q": return 12;
+         case "J": return 11;
+         case "1": return 10;
+         default: return Integer.parseInt(card.substring(0, 1));
+        }
+    }
+}
+  
